@@ -1,0 +1,204 @@
+\documentclass[a4paper,12pt]{extarticle}
+
+\renewcommand{\baselinestretch}{1.1}
+\setlength{\parindent}{0cm}
+
+%%% Add packages here
+\usepackage{times}
+\usepackage[utf8]{inputenc}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{lscape}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{array}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{verbatim}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{fancybox}
+\usepackage{mathtools}
+\usepackage{graphics}
+\usepackage[colorlinks,citecolor=red,linkcolor=black]{hyperref}
+\usepackage{subfig}
+%\usepackage{w-thm}
+
+\usepackage[super,comma,sort&compress]{natbib}
+\bibliographystyle{apalike}
+\usepackage{float}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{multicol}
+
+\addtolength{\oddsidemargin}{-.50in}
+\addtolength{\evensidemargin}{-.50in}
+\addtolength{\textwidth}{1.0in}
+\addtolength{\topmargin}{-.40in}
+\addtolength{\textheight}{0.80in}
+
+\pagestyle{fancy}
+%\chead{\groupname}
+\rhead{cyanoFilter: identifying phytoplankton population using R}
+\lhead{O. Oluwafemi \textit{et al.}}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{1.9pt}
+
+\begin{titlepage}
+	\title{
+		\begin{flushleft} 
+			\Huge{cyanoFilter: automated identification of cyanobacteria and phytoplankton population contained in flow cytometry data} \\
+			\vspace{0.4in} \small{Oluwafemi D. Olusoji$^{1,2}$, Jurg W. Spaak$^{2}$, Thomas Neyens$^{1}$, Marc Aerts$^{1}$, Frederik De Laender$^{2}$} \\\vspace{0.2in}			
+			$^{\text{\sf 1}}$Centre for Statistics, Data Sceince Institute, Hasselt University, Hasselt, 3500, Belgium\\
+			$^{\text{\sf 2}}$Research Unit in Environmental and Evolutionary Biology (URBE), Institute of Life-Earth-Environment (ILEE), Namur Institute for Complex Systems (NAXYS), Universit\'{e} de Namur, Namur, 5020, Belgium.\\\vspace{0.2in}
+			\textbf{Contact:}\\ \href{oluwafemi.olusoji@uhasselt.be}{oluwafemi.olusoji@uhasselt.be}\\
+			\textbf{Supplementary information:} Supplementary data are available at \textit{}
+		\end{flushleft}
+	}
+
+	\date{}
+\end{titlepage}
+
+
+\begin{document}
+	
+	\maketitle
+	\newpage
+	\begin{abstract}
+		\textbf{Summary:} 
+		\begin{enumerate}
+			\item Gating is the process of identifying particles measured in flow cytometry (FCM). This process could either be manual, where particles are identified using known characteristics of these particles, or automated, where automated clustering techniques are employed to identify and group these particles. Available automated gating frameworks implemented in statistical packages for flow cytometry are primarily developed for identifying outcomes in human FCM experiments with only one of such existing for cyanobacteria.
+			
+			\item cyanoFilter is an R package built to identify cyanobacteria and phytoplankton populations from flow cytometry data, based on a reproducible automated gating framework. The package allows users to combine known characteristics of their cyanobacteria cells with the gating process, which can either be sequential bivariate or multivariate.
+			
+			\item \textbf{USE}Source code is freely available through the Comprehensive R Archive Network (CRAN) \href{https://cran.r-project.org/web/packages/cyanoFilter/index.html}{https://cran.r-project.org/web/packages/cyanoFilter/index.html}. Some experiment data is made available in package. 
+			
+		\end{enumerate}
+
+		\noindent \textit{Keywords: }
+	\end{abstract}
+
+
+\title{}
+%\author[Sample \textit{et~al}.]{Oluwafemi D. Olusoji\,$^{\text{1,2,}*}$, Jurg W. Spaak\,$^{\text{2}}$, Frederik De Laender\,$^{\text{2}}$, Thomas Neyens\,$^{\text{1}}$ and Marc Aerts\,$^{\text{1}}$}
+%\address{}
+
+\maketitle
+
+\section{Introduction}
+\emph{Synechococcus} cyanobacteria are one of the known oldest life forms known to perform photosynthesis. They are ubiquitous worldwide \citep{Dvorak:2004}, and are at the base of the many aquatic food webs \citep{Kirk:1994}. Recently, studies seeking to better understand the ecology of phytoplankton in general employed flow cytometry (FCM) to measure phytoplankton abundance \citep{Pomati:2013, Fontana:2018}. FCM is a technique that involves the suspension of cells or particles within a fluid stream which is made to pass through one or more laser beams \citep{ONeill:2013}. A crucial step in FCM application is to separate signal from noise, e.g. cyanobacterial cells from other particles, including debris. Gating is classical approach taken in FCM to meet this challenge: measured particles are classified based on their properties, most notably how they reflect and/or absorb light. This process can be done manually (manual gating) or with the use of automated algorithms in computer software packages (automated gating).  
+
+Frequently, gating of cyanobacteria cells in FCM experiments is done manually or with machine learning tools\citep{Malek:2015a}. Manual gating are often not reproducible, while machine learning tools require tuning of global parameters that are not related to the biological properties of the measured cells, plus it is often difficult to include experts knowledge with this approach. To remedy these, we introduce the R package \emph{cyanoFilter} for gating \emph{Synechococcus} cyanobacteria FCM data. The package offers an automated gating approach of cyanobacteria FCM experiments. It facilitates the identification of \emph{Synechococcus} cyanobacteria population contained in FCM data with or without experts knowledge. Aside from identifying \emph{Synechococcus} cyanobacteria populations, \emph{cyanoFilter} can also identify and label other FCM outcomes.%, which paves the way for joint analysis of these outcomes. %Furthermore, the package contains tools for FCM data pre-processing and visualisation.
+%\enlargethispage{3pt}
+%\vspace*{-8pt}
+%\section{Approach}
+ %The first step addresses the question of the appropriate dilution level, the second step addresses the need for transformation or not, next the transformation is evaluated, and the last two steps address the identification of the different FCM outcomes and the cyanobacteria populations. If the transformation is not needed, the process moves to the last two steps. The process of identifying these outcomes requires the knowledge of both the flow cytometer light channels and properties of the measured cells. 
+
+
+\section{Approach}
+FCM data contain four types of events: debris (particles that are residues and non-living cells), margin events (particles that are larger than the maximum measurable width), multiplets (two or more particles stuck together) and singlets (properly measured cells; often the biologically interesting events). Singlets are typically further divided into different cyanobacteria populations. The new package \emph{cyanoFilter} (summarised in the left panel from Figure~1\vphantom{\ref{fig:1}}) represents a full pipeline for identification of singlets.
+
+\emph{cyanoFilter} contains functions to visualise, cluster and identify different cyanobacteria populations measured with FCM. All clustering functions produce two-dimensional (2D) graphs by default. There are also functions for pre-processing of accompanying metadata files.
+
+%\vspace*{-0.1in}
+\subsection{Metafile pre-processing}
+For FCM experiments conducted using dilution series, identifying files measured at the appropriate dilution level is often o interest. The \texttt{goodfcs} function uses the desired minimum, maximum $cell/\mu l$ to identify these files. The function adds an extra column (\texttt{Status}) with the entry \texttt{good} or \texttt{bad} to the metafile. Rows containing cell/$\mu l$ values outside the desired minimum and maximum are labelled \texttt{bad}. The\texttt{retain} function can further help identify the file with the highest (or smallest) cell/$\mu l$ among the appropriately measured files.
+
+%\vspace*{-0.1in}
+\subsection{Transformation and visualisation}
+The \texttt{pair\_plot} function produces a panel plot of all measured channels. Each plot is also smoothed to show the cell density. The \texttt{nona} and \texttt{noneg} function helps remove \texttt{NA}'s and negative values contained in the measured channels. We provide a function for the natural logarithm transformation (\texttt{lnTrans}). Other possible  transformation functions can be found in the  \texttt{flowCore} package.
+
+%\vspace*{-0.1in}
+\subsection{Gating margin events}
+To remove margin events, the \texttt{cellmargin} function takes the column in the expression matrix corresponding to measurements about the width of each cell. It returns a figure (supplementary material) and a list containing a R FCM file (flowframe) with non-margin events, a flowframe containing all particles with an indicator for margin and non-margin events, the number of margin and non-margin events.
+
+%\vspace*{-0.1in}
+\subsection{Gating debris and cyanobacteria}
+ The \texttt{celldebris\_nc} and \texttt{celldebris\_emclustering} functions require two and at least two channels respectively, each characterising cyanobacteria properties, to separate debris from cyanobacteria populations. The functions identify cyanobacteria using \emph{flowDensity} \citep{Malek:2015a} and \emph{finite-mixture} approach \citep{Lo:2009} respectively. Both functions return a figure (right figure in Figure~1\vphantom{\ref{fig:1}} and supplementary material) showing the clusters. In addition, \texttt{celldebris\_nc} returns a list containing the following: i) a flowframe with all debris removed, ii) a flowframe with all measured particles with an indicator for debris and cyanobacteria cells, iii) the number of cyanobacteria cells counted, and iv) the number of debris particles counted, and \texttt{celldebris\_emclustering} returns the following: i) final weight for each cluster, ii) a matrix of means for each channel per cluster, iii) a list containing variance-covariance matrices for each cluster, iv) a flowframe containing all the measured particles and the associated probabilities.
+%\enlargethispage{6pt}
+%\begin{table}[!t]
+%\processtable{This is table caption\label{Tab:01}} %{\begin{tabular}{@{}llll@{}}\toprule head1 &
+%head2 & head3 & head4\\\midrule
+%row1 & row1 & row1 & row1\\
+%row2 & row2 & row2 & row2\\
+%row3 & row3 & row3 & row3\\
+%row4 & row4 & row4 & row4\\\botrule
+%\end{tabular}}{This is a footnote}
+%\end{table}
+%\begin{figure}[!tpb]
+%	
+%	\caption{\label{fig:framework}\emph{cyanoFilter} framework. A green arrow implies a positive answer to the question posed in the rhombus while a red arrow implies a negative answer. The black arrows are pointing to functions within the package that perform the required tasks at each level.}
+%\end{figure}
+
+%\begin{figure}[!tpb]%figure1
+%\fboxsep=0pt\colorbox{gray}{\begin{minipage}[t]{235pt} \vbox to 100pt{\vfill\hbox to
+%235pt{\hfill\fontsize{24pt}{24pt}\selectfont FPO\hfill}\vfill}
+%\end{minipage}}
+%\centerline{\includegraphics{fig01.eps}}
+%\caption{Caption, caption.}\label{fig:01}
+%\end{figure}
+
+%\begin{figure}[!tpb]%figure2
+%%\centerline{\includegraphics{fig02.eps}}
+%\caption{Caption, caption.}\label{fig:02}
+%\end{figure}
+
+%\subsection{Test1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%     please remove the " % " symbol from \centerline{\includegraphics{fig01.eps}}
+%     as it may ignore the figures.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace*{-0.1in}
+\section{Summary}
+ \emph{cyanoFilter} offers a suite of functions that helps with pre-processing of FCM files and identification of all outcomes therein. It can gate cyanobacteria FCM experiments with the advantage of easy integration of knowledge about the measured cells (users can supply channels containing such information as options) and reproducibility (steps documented as R codes).
+ \vspace*{-18pt}
+\section*{Acknowledgements}
+Many thanks to several productive discussions with Jurgen Claesen on several aspects of the package.
+\vspace*{-12pt}
+\section*{Funding}
+This work was supported by funds from the bilateral co-operation (BOF) between Hasselt University and Universit\'{e} de Namur.\vspace*{-12pt}
+
+%\bibliographystyle{natbib}
+%\bibliographystyle{achemnat}
+%\bibliographystyle{plainnat}
+%\bibliographystyle{abbrv}
+%\bibliographystyle{bioinformatics}
+%
+%\bibliographystyle{plain}
+%
+%\bibliography{Document}
+
+
+\begin{thebibliography}{}
+	
+\bibitem[Dvorak, 2004]{Dvorak:2004}
+	Dvorak, P. \textit{et~al} (2014) Synechococcus: 3 billion years of global dominance. Mol. Ecol. {\bf 23}, 5538–5551.
+
+\bibitem[Fontana, 2018]{Fontana:2018}
+Fontana, S. \textit{et~al} (2018) Individual-level trait diversity predicts phytoplankton community properties better than species richness or evenness. ISME Journal {\bf 12}, 2, 356-366.
+
+\bibitem[Lo, 2009]{Lo:2009}
+Lo, K., Hahne, F., Brinkman, R. et al. (2009) flowClust: a Bioconductor package for automated gating of flow cytometry data. BMC Bioinformatics, {\bf10}, 145.
+
+\bibitem[Kirk, 1994]{Kirk:1994}
+Kirk, J. (1994) The photosynthetic apparatus of aquatic plants. \textit{Light and Photosynthesis in Aquatic Ecosystems}. 2nd edn., Cambridge University Press, Cambridge.
+
+\bibitem[Malek, 2015a]{Malek:2015a}
+Malek, M., Taghiyar, M. J. \textit{et~al} (2015) FlowDensity: Reproducing manual gating of flow cytometry data by automated density-based cell population identification. Bioinformatics, {\bf 31}, 606--607.
+
+\bibitem[ONeill, 2013]{ONeill:2013}
+O'Neill, K., \textit{et~al} (2013) Flow Cytometry Bioinformatics, {\it PLoS Computational Biology}, {\bf 9}, e1003365.
+
+\bibitem[Pomati, 2013]{Pomati:2013}
+Pomati, F., \textit{et~al} (2013) Individual Cell Based Traits Obtained by Scanning Flow-Cytometry Show Selection by Biotic and Abiotic Environmental Factors during a Phytoplankton Spring Bloom, {\it PLoS ONE}, {\bf 8}, e71677. 
+
+%\bibitem[Ribalet, 2011]{Ribalet:2011} 
+%Ribalet, F., Schruth, D. M., Armbrust, V. E.  (2011) flowPhyto: enabling automated analysis of microscopic algae from continuous flow cytometric data, Bioinformatics, {\bf 27}, 5, 732–-733.
+
+\end{thebibliography}
+\end{document}

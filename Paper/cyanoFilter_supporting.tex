@@ -1,0 +1,125 @@
+\documentclass[9pt]{extarticle}
+\usepackage{natbib}
+\usepackage{extsizes}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\hypersetup{
+colorlinks=true,
+linkcolor=black,
+filecolor=black,      
+urlcolor=black,
+citecolor=black
+}
+
+\makeatletter
+\renewcommand{\fnum@figure}{\textbf{Fig.} \thefigure}
+\makeatother
+
+\hoffset=-0.9in
+\voffset=-0.9in
+%\marginparwidth=40pt
+%\footskip=-0.1pt
+\textwidth=430pt
+\textheight=675pt
+
+%\access{Advance Access Publication Date: Day Month Year}
+%\appnotes{Manuscript Category}
+\renewcommand\thefigure{\textbf{S\arabic{figure}}}
+
+\begin{document}
+%\firstpage{1}
+
+%\subtitle{Systems Biology}
+\title{\textbf{cyanoFilter: automated identification of \emph{Synechococcus} cyanobacteria population contained in flow cytometry data}}
+\date{}
+%\author{Oluwafemi D. Olusoji$^{1,2}$, Jurg W. Spaak$^{2}$, Frederik De Laender$^{2}$, \\Thomas Neyens$^{1}$ and Marc Aerts$^{1}$\\ $^{1}$Data Sceince Institute, Hasselt University, Hasselt, 3500, Belgium\\
+%	$^{2}$Research Unit in Environmental and Evolutionary Biology (URBE), Institute of Life-Earth-Environment (ILEE), \\Namur Institute for Complex Systems (NAXYS), Universit\'{e} de Namur, Namur, 5020, Belgium.
+%}
+%\address{$^{1}$Data Sceince Institute, Hasselt University, Hasselt, 3500, Belgium\\
+%	$^{2}$Research Unit in Environmental and Evolutionary Biology (URBE), Institute of Life-Earth-Environment (ILEE), Namur Institute for Complex Systems (NAXYS), Universit\'{e} de Namur, Namur, 5020, Belgium.}
+
+%\newcommand{\address}{{% additional braces for segregating \footnotesize
+%		\bigskip
+%		\footnotesize
+		
+%		$^{1}$Data Sceince Institute, Hasselt University, Hasselt, 3500, Belgium
+		
+%		\medskip
+		
+%		$^{2}$Research Unit in Environmental and Evolutionary Biology (URBE), Institute of Life-Earth-Environment (ILEE), Namur Institute for Complex Systems (NAXYS), Universit\'{e} de Namur, Namur, 5020, Belgium.
+		
+%}}
+
+\maketitle
+%\address
+
+
+%\maketitle
+
+\section*{Application of cyanoFilter}
+
+Gating is the process of identifying particles measured in flow cytometry (FCM). This process could either be manual, where particles are identified using known characteristics of these particles, or automated, where automated clustering techniques are employed to identify and group these particles or machine learning techniques. Available automated gating frameworks implemented in statistical packages for flow cytometry are primarily developed for identifying outcomes in FCM experiments involving human cells with only one of such existing for cyanobacteria. Automated gating and machine learning techniques offer the advantage of speed, volume and reproducibility, but FCM experts usually resolve back to manual gating due to the challenges faced when they try to fuse their knowledge with these two approaches. However, manual gating that easily allow for this is subjective with results often not reproducible \citep{Maecker:2005, Malek:2015a}. We developed \textbf{cyanoFilter} to address this issue for FCM experiments involving cyanobacteria cells.
+
+The \textbf{cyanoFilter} package provides functions to visualise, cluster and identify different cyanobacteria populations contained in an FCM file. All clustering functions produce two-dimensional (2D) graphs by default. The three main clustering functions are \texttt{cellmargin}, \texttt{celldebris\_nc} and \texttt{celldebris\_emclustering}. Given the choice to estimate the cut-point or manually supplied, and the flow cytometer channel measuring the width of the measured particles, the \texttt{cellmargin} function identifies and gates out margin events. The \texttt{celldebris\_nc} and \texttt{celldebris\_emclustering} functions require two and at least two channels respectively, each characterising cyanobacteria properties, to separate debris from cyanobacteria populations. Both \texttt{cellmargin} and \texttt{celldebris\_nc} estimates the minimum intersection point between identified peaks in a 2-dimensional kernel density estimate of the data (\textbf{flowDensity}), while \texttt{celldebris\_emclustering} uses \emph{EM} clustering. Other functions such as \texttt{retain}, \texttt{goodfcs}, \texttt{nona}, \texttt{noneg} and \texttt{pair\_plot} are pre-processing and visualisation functions. We employ users to visit \href{https://github.com/fomotis/cyanoFilter}{https://github.com/fomotis/cyanoFilter} to see the codes used in producing all graphs.
+
+\subsection*{Sample Synechococcus cyanobacteria properties}
+
+Figure \ref{fig:bs4bs5properties} shows the characteristics of an example of two \emph{Synechococcus}-type cyanobacteria, \emph{BS4} and \emph{BS5}. \emph{BS4} absorbs photons at the orange-red $(620-630nm)$ part of the light spectrum due to the presence of phycocyanin, a protein responsible for its blue-green colour while \emph{BS5} absorbs photons at the green-yellow $(560-570nm)$ part of the light spectrum due to the presence of phycoerythrin, a protein responsible for its red colour. Both cyanobacteria also absorb photons at the blue and red part of the spectrum, $(430nm$ and $680nm)$, due to the presence of chlorophyll \emph{a} \citep{Stomp:2004}. In this case, the knowledge about the presence of chlorophyll \emph{a} can help separate cyanobacteria cells (singlets) from debris, and the presence or absence of phycocyanin or phycoerythrin can help separate \emph{BS4} from \emph{BS5} cells.
+
+\begin{figure*}[h]
+	\centering
+	\includegraphics[scale=0.4]{synecoccusCyanobacteria.eps}
+	\caption{\label{fig:bs4bs5properties}Two \emph{Synechococcus}-type cyanobacteria named BS4 and BS5.}
+\end{figure*}
+
+We illustrate the use of \textbf{cyanoFilter} to identify margin events, BS4 in a monoculture experiment using a sample FCM dataset contained in the package. There is also a demonstration involving two cyanobacteria species on \href{https://github.com/fomotis/cyanoFilter}{https://github.com/fomotis/cyanoFilter}. All source codes are also present here.
+
+\subsection*{Gating Margin Events and cyanobacteria}
+
+To remove margin events, the \texttt{cellmargin} function takes the column in the expression matrix corresponding to measurements about the width of each cell. The function estimates the minimum cut-off point between peak for margin events and that of the ones properly measured (see Figure \ref{fig:margin}). Users can also supply a cut-off point if they so choose.
+
+\begin{figure*}[h!]
+
+	\begin{minipage}[b]{0.5\textwidth}
+		\includegraphics[scale=0.4]{cyanoFilter-margin_events.eps}
+	\end{minipage}
+	\qquad
+	\begin{minipage}[b]{0.5\textwidth}
+		\includegraphics[scale=0.4]{cyanoFilter-gating2.eps}
+	\end{minipage}
+	
+	\caption{\label{fig:margin} \textbf{Left}: Smoothed Scatterplot of measured width (\textbf{SSC.W}) and height (\textbf{FSC.HLin}). The red line is the estimated cut point differentiating margin events from properly measured particles. Every particle below the red line has their width properly measured. \textbf{Right}: Smoothed scatterplot of all channels used for gating. The plot is generated by assigning points to each cluster if their chance of belonging to that cluster is atleast 80\%. Each colour represents a cluster, and  the boundaries of the cluster with the highest number of particles is drawn with red dotted lines.}
+\end{figure*}
+
+To identify BS4 cyanobacteria cells, after removing margin events, one can supply supply two channels measuring the presence of chlorophyll \emph{a}, \textbf{RED.B.HLin}, and phycoerythrin, \textbf{YEL.B.HLin} for \texttt{celldebris\_nc} (see Figure 1 in main text) or more for \texttt{celldebris\_emclustering} (Figure \ref{fig:margin}). Doing this ensures that we use the information about chlorophyll \emph{a} and phycoerythrin in classifying the cells. In the absence of such information, panel plot of all channels can provide clues on which of them could help in the gating process (see Figure \ref{fig:panelplot}). 
+
+\begin{figure*}[h!]
+	
+	\begin{minipage}[b]{0.5\textwidth}
+		\includegraphics[scale=0.42]{cyanoFilter-remove_na.eps}
+	\end{minipage}
+	\qquad
+	\begin{minipage}[b]{0.5\textwidth}
+		\includegraphics[scale=0.42]{cyanoFilter-logtrans.eps}
+	\end{minipage}
+	
+	\caption{\label{fig:panelplot} \textbf{Left}: Panel plot for all channels measured. \textbf{Right}: Panel plot for all measured channels after log transformation}
+\end{figure*}
+
+Clusters are clearly visible in the right figure in Figure \ref{fig:panelplot} compared to that on the left. Thus, the logarithmic transformation appears satisfactory in this case. 
+
+Although the \texttt{celldebris\_emclustering} can handle data files with several cyanobacteria species, its counterpart \texttt{celldebris\_nc} can only handle datafiles with at most two cyanobacteria species. However, one could perform a sequence of gating with this function to identify each species. A future direction for this work is to expand the \texttt{celldebris\_nc} function to cater for datafiles with more than two cyanobacteria species.  Furthermore, a knowledge of the flow cytometer used for measurement is crucial to the \texttt{goodfcs} and \texttt{cellmargin} functions.
+
+\begin{thebibliography}{}
+	
+	\bibitem[Malek, 2015a]{Malek:2015a}
+	Malek, M., Taghiyar, M. J. \textit{et~al} (2015) FlowDensity: Reproducing manual gating of flow cytometry data by automated density-based cell population identification. Bioinformatics, {\bf 31}, 606--607.
+	
+	\bibitem[Maecker, 2005]{Maecker:2005} Maecker, H., Rinfret, A., D’Souza, P., \textit{et~al} (2005). Standardization of cytokine flow cytometry assays. BMC Immunol, {\bf 6}, 13.
+	
+	\bibitem[Stomp, 2004]{Stomp:2004}
+	Stomp, M., Huisman, J., De Jong, F., \textit{et~al} (2004) Adaptive divergence in pigment composition promotes phytoplankton biodiversity, Nature {\bf 7013}, 104--107.
+	
+\end{thebibliography}
+\end{document}
